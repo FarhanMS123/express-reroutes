@@ -1,0 +1,27 @@
+{
+  "name": "express-reroutes",
+  "version": "1.0.0",
+  "description": "rerouting request to another file or another url",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FarhanMS123/express-reroutes.git"
+  },
+  "keywords": [
+    "express",
+    "middleware"
+  ],
+  "author": "FarhanMS123",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FarhanMS123/express-reroutes/issues"
+  },
+  "homepage": "https://github.com/FarhanMS123/express-reroutes#readme",
+  "dependencies": {
+    "mustache": "^4.0.1",
+    "path-match": "^1.2.4"
+  }
+}

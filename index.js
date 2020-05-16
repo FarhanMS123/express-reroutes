@@ -18,15 +18,16 @@ var mustache = require("mustache");
  * - regular expression : "^dir1/dir2/dir3/.*.html(\\?.*)?$"
  * 
  * value : 
- * - redirect to a url (relative) : "../dir4/file2.html"
- * - redirect to a url (absolute) : "/dir1/dir2/dir4/file2.html"
+ * - redirect to an url (relative) : "../dir4/file2.html"
+ * - redirect to an url (absolute) : "/dir1/dir2/dir4/file2.html"
  * - redirect to a host url : "https://example.com/dir1/dir2/iam.php"
  * - {@link https://github.com/janl/mustache.js mustache} by and only with path pattern : "/main_render.html#{{ dir_name }},{{ 0 }}.{{ 1 }}"
  * - {@link https://en.wikipedia.org/wiki/List_of_HTTP_status_codes http code} : 500
+ * - http code with description : "500 internal server error"
  * - render a file relative (works with {@link https://www.npmjs.com/package/express-truepath express-truepath}) : "FILE ./web/file.ejs"
  * - render a file absolute (works with express-truepath) : "FILE /usr/bin/web/file.ejs"
  * - {@link https://expressjs.com/en/guide/writing-middleware.html middleware} : function(req, res, next){next();}
- * @param {Object} routes 
+ * @param {Object.<string, string|number|function>} routes 
  */
 function middleware(routes={}){
     return function(req,res,next){
@@ -43,14 +44,32 @@ function middleware(routes={}){
                         req._dirpath = req.dirpath;
                         req.filepath = filepath;
                         req.dirpath = path.dirname(filepath);
+                    }else if(parseInt(routes_key.slice(0,3))){ // set http code and messages
+                        if(res.status){
+                            res.status(parseInt(routes_key.slice(0,3)));
+                        }else{
+                            res.statusCode = parseInt(routes_key.slice(0,3));
+                        }
+                        if(x.length >= 5) res.statusMessage = routes_key.slice(4);
                     }else{ // redirect to somewhere
-                        res.redirect(routes_key);
+                        if(res.redirect){
+                            res.redirect(routes_key);
+                        }else{
+                            res.writeHead(300, "multiple choices", {
+                                "Location": routes_key
+                            });
+                        }
                     }
                 }else if(typeof routes[key] == "number"){ //set http status code
-                    res.status(routes[key]);
+                    if(res.status){
+                        res.status(parseInt(routes_key.slice(0,3)));
+                    }else{
+                        res.statusCode = parseInt(routes_key.slice(0,3));
+                    }
                 }else if(typeof routes[key] == "function"){ //do something with function
                     do_next = false;
-                    routes[key](req,res,next);
+                    req.routes = params;
+                    routes[key](req,res,function(...args){req.routes = undefined; next.apply(global, args);});
                 }
                 break;
             }
@@ -60,5 +79,3 @@ function middleware(routes={}){
 }
 
 module.exports = middleware;
-
-middleware()

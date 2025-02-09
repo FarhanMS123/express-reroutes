@@ -1,5 +1,8 @@
 # express-reroutes
 
+> [!NOTE]  
+> Permanently archieved due no interest and real use-case for meta-serving application
+
 Reroutes url to another url (redirecting), set status code, or use another file (rendering)
 
 ## Installation
